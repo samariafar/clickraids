@@ -10,3 +10,4 @@
 *.mrconfig      linguist-language=ini diff=ini
 
 /.github        export-ignore
+/docs           export-ignore
