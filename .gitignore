@@ -1,0 +1,21 @@
+# DevTools
+/.idea/
+/.vscode/
+
+# Environment Files
+/.direnv/
+
+# Dependencies
+/node_modules/
+
+# Builds
+/target/
+/public/
+*.lock*
+
+# Misc.
+.DS_Store
+Thumbs.db
+desktop.ini
+*.sw?
+*~

@@ -1,0 +1,12 @@
+*               text eol=lf
+.*              text eol=lf
+
+*.ico           binary
+*.png           binary
+*.woff          binary
+*.woff2         binary
+
+*.md            diff=markdown
+*.mrconfig      linguist-language=ini diff=ini
+
+/.github        export-ignore
