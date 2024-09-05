@@ -8,6 +8,7 @@
 
 *.md            diff=markdown
 *.mrconfig      linguist-language=ini diff=ini
+*.envrc         linguist-vendored=true
 
 /.github        export-ignore
 /docs           export-ignore
