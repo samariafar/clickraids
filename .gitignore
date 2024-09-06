@@ -16,6 +16,9 @@
 /public/
 *.lock*
 
+# Data
+*.bin
+
 # Misc.
 .DS_Store
 Thumbs.db
