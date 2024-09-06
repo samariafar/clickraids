@@ -1,0 +1,10 @@
+[package]
+name = "clickraids"
+version = "1.0.0"
+edition = "2021"
+
+[[bin]]
+name = "clickraids"
+path = "src/server/main.rs"
+
+[dependencies]
