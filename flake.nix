@@ -15,6 +15,7 @@
           packages = with pkgs; [
             bun
             cargo
+            mprocs
             rustc
           ];
         };
