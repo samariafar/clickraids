@@ -7,3 +7,31 @@ body {
 #root {
   height: 100%;
 }
+
+#checkerboard {
+  // Keep --cell-size in sync with rowHeight/colWidth in index.ts; --font-size scales proportionally
+  --cell-size: 40px;
+  --font-size: 30px;
+  --light-color: #f1f1f1;
+  --dark-color: #1f1f1f;
+
+  position: relative;
+  height: 100%;
+  overflow: scroll;
+
+  .row {
+    display: flex;
+
+    .cell {
+      flex: 1;
+      box-sizing: border-box;
+
+      .checkbox {
+        width: var(--cell-size);
+        height: var(--cell-size);
+        font-size: var(--font-size);
+        margin: 0;
+      }
+    }
+  }
+}
