@@ -1,0 +1,26 @@
+&--checkboxes {
+  color-scheme: light dark;
+  --background-color: light-dark(white, black);
+  --accent-color: light-dark(black, white);
+
+  background-color: var(--background-color);
+  scrollbar-color: var(--accent-color) var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    box-sizing: border-box;
+    border: 1px solid var(--accent-color);
+    background-color: var(--background-color);
+    cursor: pointer;
+    text-align: center;
+    line-height: var(--cell-size);
+    font-weight: bold;
+    color: var(--accent-color);
+
+    &:checked::before {
+      content: "✓";
+    }
+  }
+}

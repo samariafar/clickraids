@@ -1,0 +1,20 @@
+&--bookworm {
+  --background-color: #a07a55;
+
+  background-color: var(--background-color);
+  scrollbar-color: #8b4513 var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+    vertical-align: middle;
+
+    &::before {
+      content: "📖";
+    }
+
+    &:checked::before {
+      content: "📱";
+    }
+  }
+}

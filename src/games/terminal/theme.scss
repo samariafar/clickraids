@@ -1,0 +1,16 @@
+&--terminal {
+  --primary-color: #4af626;
+  --background-color: black;
+
+  background-color: var(--background-color);
+  scrollbar-color: var(--primary-color) var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    border: 1px solid var(--background-color);
+
+    &:checked {
+      background-color: var(--primary-color);
+    }
+  }
+}

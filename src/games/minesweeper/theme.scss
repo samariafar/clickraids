@@ -1,0 +1,27 @@
+&--minesweeper {
+  --background-color: silver;
+
+  background-color: var(--background-color);
+  scrollbar-color: var(--light-color) var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+    vertical-align: middle;
+    border: 2px outset #ececec;
+
+    &::before {
+      content: "💣";
+    }
+
+    &:checked {
+      border-style: solid;
+      border-color: #999999;
+      border-width: 2px 0 0 2px;
+
+      &::before {
+        content: "💥";
+      }
+    }
+  }
+}

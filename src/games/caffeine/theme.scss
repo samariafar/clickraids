@@ -1,0 +1,20 @@
+&--caffeine {
+  --background-color: #e8b94f;
+
+  background-color: var(--background-color);
+  scrollbar-color: #3d2817 var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+    vertical-align: middle;
+
+    &::before {
+      content: "☕";
+    }
+
+    &:checked::before {
+      content: "🧉";
+    }
+  }
+}

@@ -1,0 +1,30 @@
+&--crusade {
+  --background-color: #cfbF77;
+
+  background-color: var(--background-color);
+  scrollbar-color: var(--light-color) var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+    vertical-align: middle;
+    font-size: calc(var(--cell-size) - 2px);
+    line-height: var(--cell-size);
+    border-radius: 50%;
+    background-color: #242424;
+
+    &::before {
+      content: "✝";
+      color: #a02020;
+    }
+
+    &:checked {
+      background-color: #00711d;
+
+      &::before {
+        content: "☪";
+        color: white;
+      }
+    }
+  }
+}

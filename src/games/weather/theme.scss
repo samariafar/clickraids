@@ -1,0 +1,21 @@
+&--weather {
+  --background-color: skyblue;
+
+  background-color: var(--background-color);
+  scrollbar-color: var(--light-color) var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+
+    &::before {
+      content: "🌤️";
+      vertical-align: middle;
+    }
+
+    &:checked::before {
+      content: "🌧️";
+      vertical-align: -6px;
+    }
+  }
+}

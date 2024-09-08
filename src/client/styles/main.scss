@@ -34,4 +34,34 @@ body {
       }
     }
   }
+
+  &.game {
+    @import "../../games/apocalypse/theme";
+    @import "../../games/battleship/theme";
+    @import "../../games/bookworm/theme";
+    @import "../../games/brew/theme";
+    @import "../../games/buckingham/theme";
+    @import "../../games/burger/theme";
+    @import "../../games/caffeine/theme";
+    @import "../../games/checkboxes/theme";
+    @import "../../games/commute/theme";
+    @import "../../games/crusade/theme";
+    @import "../../games/equality/theme";
+    @import "../../games/food/theme";
+    @import "../../games/game/theme";
+    @import "../../games/magic/theme";
+    @import "../../games/matrix/theme";
+    @import "../../games/minesweeper/theme";
+    @import "../../games/peekaboo/theme";
+    @import "../../games/pets/theme";
+    @import "../../games/realm/theme";
+    @import "../../games/season/theme";
+    @import "../../games/speed/theme";
+    @import "../../games/system/theme";
+    @import "../../games/terminal/theme";
+    @import "../../games/toast/theme";
+    @import "../../games/travel/theme";
+    @import "../../games/twilight/theme";
+    @import "../../games/weather/theme";
+  }
 }

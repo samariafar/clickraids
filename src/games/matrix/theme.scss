@@ -1,0 +1,32 @@
+@font-face {
+  font-family: "White Rabbit";
+  src: url("/fonts/WhiteRabbit.woff2") format("woff2");
+}
+
+&--matrix {
+  --primary-color: #089d29;
+  --background-color: black;
+
+  background-color: var(--background-color);
+  scrollbar-color: var(--primary-color) var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+
+    &::before {
+      content: "0";
+      color: #484848;
+      font-family: "White Rabbit", monospace;
+    }
+
+    &:checked::before {
+      content: "1";
+      color: var(--primary-color);
+      font-family: monospace;
+      font-size: calc(var(--font-size) - 4px);
+    }
+  }
+}

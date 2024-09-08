@@ -1,0 +1,20 @@
+&--twilight {
+  --background-color: #182841;
+
+  background-color: var(--background-color);
+  scrollbar-color: orange var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+    vertical-align: middle;
+
+    &::before {
+      content: "🌞";
+    }
+
+    &:checked::before {
+      content: "🌚";
+    }
+  }
+}

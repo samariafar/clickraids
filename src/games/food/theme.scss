@@ -1,0 +1,20 @@
+&--food {
+  --background-color: #58331f;
+
+  background-color: var(--background-color);
+  scrollbar-color: var(--light-color) var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+    vertical-align: middle;
+
+    &::before {
+      content: "🥩";
+    }
+
+    &:checked::before {
+      content: "🥦";
+    }
+  }
+}
