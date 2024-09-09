@@ -1,0 +1,127 @@
+.home {
+  height: 100%;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #0e1116 0%, #1a1f2c 100%);
+  color: #e8ecf2;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  .home__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 64px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .home__logo {
+    font-family: Pixels, sans-serif;
+    font-size: clamp(4rem, 11vw, 8rem);
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    letter-spacing: 2px;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .home__pitch {
+    margin: 0;
+    font-size: 1rem;
+    color: #98a2b3;
+    letter-spacing: 0.5px;
+    text-align: center;
+
+    // Sentence-level wrap: each <span> stays intact; the second drops to
+    // its own line only when the viewport can't fit both side-by-side.
+    > span {
+      display: inline-block;
+      white-space: nowrap;
+    }
+  }
+
+  .home__grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .home__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 16px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
+
+    &:hover, &:focus {
+      transform: translateY(-2px);
+      background-color: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.18);
+      outline: none;
+    }
+  }
+
+  .home__card-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: #fff;
+  }
+
+  .home__card-versus {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .home__card-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 64px;
+  }
+
+  .home__card-emoji {
+    font-size: 2.25rem;
+    line-height: 1;
+  }
+
+  .home__card-label {
+    font-size: 0.8rem;
+    color: #c4cad4;
+    text-align: center;
+  }
+
+  .home__card-vs {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .home__footer {
+    margin-top: 48px;
+    font-size: 0.85rem;
+    color: #6b7280;
+
+    a {
+      color: #c4cad4;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+
+      &:hover, &:focus {
+        border-bottom-color: currentColor;
+      }
+    }
+  }
+}

@@ -1,3 +1,10 @@
+@import "home";
+
+@font-face {
+  font-family: Pixels;
+  src: url("/fonts/Pixels.woff2") format("woff2");
+}
+
 body {
   margin: 0;
   height: 100vh;
@@ -63,5 +70,23 @@ body {
     @import "../../games/travel/theme";
     @import "../../games/twilight/theme";
     @import "../../games/weather/theme";
+  }
+}
+
+.not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 100vh;
+  font-family: system-ui, sans-serif;
+
+  h1, p { margin: 0; font-size: 1.125rem; }
+  h1 { padding-right: 1rem; border-right: 1px solid #cbd5e0; }
+
+  @media (prefers-color-scheme: dark) {
+    background: #1a202c;
+    color: #fff;
+    h1 { border-right-color: #4a5568; }
   }
 }

@@ -13,6 +13,7 @@ use axum::{
         ws::{Message, WebSocket, WebSocketUpgrade},
         State,
     },
+    http::{header, StatusCode},
     response::IntoResponse,
     routing::get,
     Router,
@@ -138,6 +139,16 @@ fn spawn_backup_writer(state: Bitmap, mut file: File, mut rx: mpsc::UnboundedRec
     });
 }
 
+async fn spa_fallback() -> impl IntoResponse {
+    match tokio::fs::read("public/index.html").await {
+        Ok(bytes) => ([(header::CONTENT_TYPE, "text/html; charset=utf-8")], bytes).into_response(),
+        Err(e) => {
+            log::error!("Failed to read public/index.html: {}", e);
+            (StatusCode::INTERNAL_SERVER_ERROR, "App bundle missing").into_response()
+        }
+    }
+}
+
 async fn ws_handler(
     upgrade: WebSocketUpgrade,
     State(app): State<AppState>,
@@ -258,7 +269,11 @@ async fn main() {
 
     let app = Router::new()
         .route("/ws", get(ws_handler))
-        .fallback_service(ServeDir::new("public").append_index_html_on_directories(true))
+        .fallback_service(
+            ServeDir::new("public")
+                .append_index_html_on_directories(true)
+                .fallback(get(spa_fallback)),
+        )
         .with_state(app_state);
 
     axum::serve(listener, app).await.unwrap();

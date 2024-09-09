@@ -25,6 +25,13 @@ export default defineConfig({
       }
     }
   },
+  tools: {
+    cssLoader: {
+      url: {
+        filter: (url: string) => !url.startsWith('/')
+      }
+    }
+  },
   source: {
     entry: {
       index: './src/client/index.ts'
