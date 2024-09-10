@@ -1,0 +1,14 @@
+{
+    "name": "ClickRaids",
+    "short_name": "ClickRaids",
+    "icons": [
+        {
+            "src": "/images/favicon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff",
+    "display": "standalone"
+}

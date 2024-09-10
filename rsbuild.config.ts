@@ -3,13 +3,17 @@ import { pluginSass } from '@rsbuild/plugin-sass';
 
 const frontendPort = Number(process.env.FRONTEND_PORT ?? 3000);
 const backendPort = process.env.BACKEND_PORT ?? '8000';
+const siteUrl = process.env.SITE_URL?.replace(/\/+$/, '') ?? '';
 
 export default defineConfig({
   plugins: [
     pluginSass()
   ],
   html: {
-    template: './src/client/index.html'
+    template: './src/client/index.html',
+    templateParameters: {
+      siteUrl
+    }
   },
   server: {
     host: '::',
