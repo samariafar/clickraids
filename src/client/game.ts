@@ -86,7 +86,7 @@ export function renderGame(root: HTMLElement, game: Game): () => void {
   };
 
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const websocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws`);
+  const websocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/${game.slug}`);
   websocket.binaryType = 'arraybuffer';
 
   let receivedSnapshot = false;

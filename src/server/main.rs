@@ -1,6 +1,10 @@
+mod games;
+
 use std::{
+    collections::HashMap,
     fs::{File, OpenOptions},
     io::{Read, Seek, SeekFrom, Write},
+    path::PathBuf,
     sync::{
         atomic::{AtomicU64, Ordering},
         Arc,
@@ -11,7 +15,7 @@ use std::{
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},
-        State,
+        Path, State,
     },
     http::{header, StatusCode},
     response::IntoResponse,
@@ -63,11 +67,15 @@ impl CheckboxUpdate {
 
 type Bitmap = Arc<Vec<AtomicU64>>;
 
-#[derive(Clone)]
-struct AppState {
+struct Game {
     state: Bitmap,
     broadcast_tx: broadcast::Sender<CheckboxUpdate>,
     backup_tx: mpsc::UnboundedSender<usize>,
+}
+
+#[derive(Clone)]
+struct AppState {
+    games: Arc<HashMap<&'static str, Arc<Game>>>,
 }
 
 fn new_state() -> Bitmap {
@@ -94,7 +102,7 @@ fn snapshot_bytes(state: &Bitmap) -> Vec<u8> {
     buf
 }
 
-fn load_from_file_or_init(file: &mut File, state: &Bitmap) {
+fn load_from_file_or_init(file: &mut File, state: &Bitmap, slug: &str) {
     let file_len = file.metadata().unwrap().len();
 
     if file_len == 0 {
@@ -102,7 +110,7 @@ fn load_from_file_or_init(file: &mut File, state: &Bitmap) {
 
         file.write_all(&buffer).unwrap();
 
-        log::info!("Initialized new state file with default state.");
+        log::info!("[{}] Initialized new state file with default state.", slug);
     } else {
         let mut buffer = [0u8; SNAPSHOT_BYTES];
 
@@ -114,13 +122,19 @@ fn load_from_file_or_init(file: &mut File, state: &Bitmap) {
             state[i].store(word, Ordering::Relaxed);
         }
 
-        log::info!("Loaded state from existing file.");
+        log::info!("[{}] Loaded state from existing file.", slug);
     }
 }
 
-// Single dedicated writer task; reads the affected byte's current value from the in-memory atomic
-// (the source of truth) and persists it. The file is a recovery backup, never on the serving path.
-fn spawn_backup_writer(state: Bitmap, mut file: File, mut rx: mpsc::UnboundedReceiver<usize>) {
+// Single dedicated writer task per game; reads the affected byte's current value from the
+// in-memory atomic (the source of truth) and persists it. The file is a recovery backup,
+// never on the serving path.
+fn spawn_backup_writer(
+    slug: &'static str,
+    state: Bitmap,
+    mut file: File,
+    mut rx: mpsc::UnboundedReceiver<usize>,
+) {
     task::spawn_blocking(move || {
         while let Some(index) = rx.blocking_recv() {
             let word_idx = index >> 6;
@@ -133,7 +147,7 @@ fn spawn_backup_writer(state: Bitmap, mut file: File, mut rx: mpsc::UnboundedRec
                 .seek(SeekFrom::Start(byte_pos))
                 .and_then(|_| file.write_all(&[byte]))
             {
-                log::error!("Backup write failed at byte {}: {}", byte_pos, e);
+                log::error!("[{}] Backup write failed at byte {}: {}", slug, byte_pos, e);
             }
         }
     });
@@ -151,21 +165,30 @@ async fn spa_fallback() -> impl IntoResponse {
 
 async fn ws_handler(
     upgrade: WebSocketUpgrade,
+    Path(slug): Path<String>,
     State(app): State<AppState>,
 ) -> impl IntoResponse {
-    upgrade.on_upgrade(move |socket| handle_socket(socket, app))
+    let Some((&slug, game)) = app.games.get_key_value(slug.as_str()) else {
+        return (StatusCode::NOT_FOUND, "Unknown game").into_response();
+    };
+    let game = game.clone();
+    upgrade
+        .on_upgrade(move |socket| handle_socket(socket, slug, game))
+        .into_response()
 }
 
-async fn handle_socket(socket: WebSocket, app: AppState) {
+async fn handle_socket(socket: WebSocket, slug: &'static str, game: Arc<Game>) {
     let mut last_update_time = Instant::now();
     let update_interval = Duration::from_secs_f32(1.0 / 3.0);
 
+    log::info!("[{}] New client connected.", slug);
+
     let (mut write, mut read) = socket.split();
     let (tx, mut rx) = mpsc::unbounded_channel::<Message>();
-    let mut receiver = app.broadcast_tx.subscribe();
+    let mut receiver = game.broadcast_tx.subscribe();
 
     {
-        let bytes = snapshot_bytes(&app.state);
+        let bytes = snapshot_bytes(&game.state);
         let compressed = zstd::bulk::compress(&bytes, 0).unwrap();
         let message = Message::Binary(compressed);
 
@@ -182,9 +205,7 @@ async fn handle_socket(socket: WebSocket, app: AppState) {
         }
     });
 
-    let state = app.state.clone();
-    let backup_tx = app.backup_tx.clone();
-    let broadcast_tx = app.broadcast_tx.clone();
+    let read_game = game.clone();
     let read_task = task::spawn(async move {
         while let Some(Ok(message)) = read.next().await {
             if let Message::Binary(bytes) = message {
@@ -192,12 +213,17 @@ async fn handle_socket(socket: WebSocket, app: AppState) {
                     last_update_time = Instant::now();
 
                     if let Some(update) = CheckboxUpdate::from_bytes(&bytes) {
-                        set_bit(&state, update.index, update.state);
-                        let _ = backup_tx.send(update.index);
+                        set_bit(&read_game.state, update.index, update.state);
+                        let _ = read_game.backup_tx.send(update.index);
 
-                        log::info!("Checkbox at index {} updated to state: {}", update.index, update.state);
+                        log::info!(
+                            "[{}] Checkbox at index {} updated to state: {}",
+                            slug,
+                            update.index,
+                            update.state
+                        );
 
-                        let _ = broadcast_tx.send(update);
+                        let _ = read_game.broadcast_tx.send(update);
                     }
                 }
             }
@@ -219,6 +245,8 @@ async fn handle_socket(socket: WebSocket, app: AppState) {
         _ = read_task => {},
         _ = broadcast_task => {},
     }
+
+    log::info!("[{}] Client disconnected.", slug);
 }
 
 #[tokio::main]
@@ -242,33 +270,50 @@ async fn main() {
 
     log::info!("Listening on: {}", addr);
 
-    let state = new_state();
-    let (broadcast_tx, _) = broadcast::channel(100);
+    let state_dir: PathBuf = std::env::var("STATE_DIR")
+        .unwrap_or_else(|_| "./data".to_string())
+        .into();
+    if let Err(e) = std::fs::create_dir_all(&state_dir) {
+        log::error!("Cannot create state directory '{}': {}", state_dir.display(), e);
+        std::process::exit(1);
+    }
 
-    let state_path = std::env::var("STATE_FILE").unwrap_or_else(|_| "./state.bin".to_string());
-    let mut file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .open(&state_path)
-        .unwrap_or_else(|e| {
-            log::error!("Cannot open state file '{}': {}", state_path, e);
-            std::process::exit(1);
-        });
+    let mut games_map: HashMap<&'static str, Arc<Game>> = HashMap::with_capacity(games::SLUGS.len());
+    for &slug in games::SLUGS.iter() {
+        let state = new_state();
+        let path = state_dir.join(format!("{}-state.bin", slug));
+        let mut file = OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .open(&path)
+            .unwrap_or_else(|e| {
+                log::error!("Cannot open state file '{}': {}", path.display(), e);
+                std::process::exit(1);
+            });
+        load_from_file_or_init(&mut file, &state, slug);
 
-    load_from_file_or_init(&mut file, &state);
+        let (backup_tx, backup_rx) = mpsc::unbounded_channel::<usize>();
+        spawn_backup_writer(slug, state.clone(), file, backup_rx);
 
-    let (backup_tx, backup_rx) = mpsc::unbounded_channel::<usize>();
-    spawn_backup_writer(state.clone(), file, backup_rx);
+        let (broadcast_tx, _) = broadcast::channel(100);
+
+        games_map.insert(
+            slug,
+            Arc::new(Game {
+                state,
+                broadcast_tx,
+                backup_tx,
+            }),
+        );
+    }
 
     let app_state = AppState {
-        state,
-        broadcast_tx,
-        backup_tx,
+        games: Arc::new(games_map),
     };
 
     let app = Router::new()
-        .route("/ws", get(ws_handler))
+        .route("/ws/:slug", get(ws_handler))
         .fallback_service(
             ServeDir::new("public")
                 .append_index_html_on_directories(true)

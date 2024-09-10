@@ -9,6 +9,7 @@ fn main() {
     }
 
     println!("cargo:rerun-if-changed=src/client");
+    println!("cargo:rerun-if-changed=src/games");
 
     let output = Command::new("bun")
         .arg("run")
