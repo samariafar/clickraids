@@ -16,7 +16,7 @@ function navigate(slug: string): void {
   cleanup = null;
 
   if (slug === '') {
-    renderHome(root, navigate);
+    cleanup = renderHome(root, navigate);
   } else {
     const game = gameBySlug(slug);
     if (game) {

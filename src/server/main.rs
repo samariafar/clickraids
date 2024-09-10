@@ -6,7 +6,7 @@ use std::{
     io::{Read, Seek, SeekFrom, Write},
     path::PathBuf,
     sync::{
-        atomic::{AtomicU64, Ordering},
+        atomic::{AtomicU64, AtomicUsize, Ordering},
         Arc,
     },
     time::{Duration, Instant},
@@ -69,6 +69,7 @@ type Bitmap = Arc<Vec<AtomicU64>>;
 
 struct Game {
     state: Bitmap,
+    player_count: AtomicUsize,
     broadcast_tx: broadcast::Sender<CheckboxUpdate>,
     backup_tx: mpsc::UnboundedSender<usize>,
 }
@@ -177,11 +178,36 @@ async fn ws_handler(
         .into_response()
 }
 
+async fn stats_ws_handler(
+    upgrade: WebSocketUpgrade,
+    State(app): State<AppState>,
+) -> impl IntoResponse {
+    upgrade.on_upgrade(move |socket| handle_stats_socket(socket, app))
+}
+
+async fn handle_stats_socket(mut socket: WebSocket, app: AppState) {
+    let mut tick = tokio::time::interval(Duration::from_secs(1));
+    loop {
+        tick.tick().await;
+
+        let mut buf = Vec::with_capacity(games::SLUGS.len() * 4);
+        for &slug in games::SLUGS.iter() {
+            let count = app.games[slug].player_count.load(Ordering::Relaxed) as u32;
+            buf.extend_from_slice(&count.to_be_bytes());
+        }
+
+        if socket.send(Message::Binary(buf)).await.is_err() {
+            break;
+        }
+    }
+}
+
 async fn handle_socket(socket: WebSocket, slug: &'static str, game: Arc<Game>) {
     let mut last_update_time = Instant::now();
     let update_interval = Duration::from_secs_f32(1.0 / 3.0);
 
-    log::info!("[{}] New client connected.", slug);
+    let count = game.player_count.fetch_add(1, Ordering::Relaxed) + 1;
+    log::info!("[{}] New player joined. Game players: {}", slug, count);
 
     let (mut write, mut read) = socket.split();
     let (tx, mut rx) = mpsc::unbounded_channel::<Message>();
@@ -193,6 +219,7 @@ async fn handle_socket(socket: WebSocket, slug: &'static str, game: Arc<Game>) {
         let message = Message::Binary(compressed);
 
         if tx.send(message).is_err() {
+            game.player_count.fetch_sub(1, Ordering::Relaxed);
             return;
         }
     }
@@ -246,7 +273,8 @@ async fn handle_socket(socket: WebSocket, slug: &'static str, game: Arc<Game>) {
         _ = broadcast_task => {},
     }
 
-    log::info!("[{}] Client disconnected.", slug);
+    let count = game.player_count.fetch_sub(1, Ordering::Relaxed) - 1;
+    log::info!("[{}] Player left. Game players: {}", slug, count);
 }
 
 #[tokio::main]
@@ -302,6 +330,7 @@ async fn main() {
             slug,
             Arc::new(Game {
                 state,
+                player_count: AtomicUsize::new(0),
                 broadcast_tx,
                 backup_tx,
             }),
@@ -313,6 +342,7 @@ async fn main() {
     };
 
     let app = Router::new()
+        .route("/ws/stats", get(stats_ws_handler))
         .route("/ws/:slug", get(ws_handler))
         .fallback_service(
             ServeDir::new("public")

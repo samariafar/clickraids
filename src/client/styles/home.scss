@@ -42,6 +42,53 @@
     }
   }
 
+  .stats {
+    margin: 14px 0 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #98a2b3;
+    letter-spacing: 0.3px;
+  }
+
+  .stats__label {
+    color: #6b7280;
+  }
+
+  .counter {
+    // Single knob: changing this scales segment thickness and corner spacing
+    // proportionally via the SVG viewBox. Padding and digit-spacing stay fixed.
+    --digit-height: 22px;
+
+    display: inline-flex;
+    gap: 3px;
+    padding: 4px;
+    line-height: 0;
+  }
+
+  .counter__digit {
+    display: block;
+    height: var(--digit-height);
+    width: calc(var(--digit-height) * 12 / 22);
+
+    .seg {
+      fill: #315324;
+      transition: fill 250ms;
+    }
+  }
+
+  .counter__digit[data-digit="0"] :is(.seg-a, .seg-b, .seg-c, .seg-d, .seg-e, .seg-f) { fill: #76FF03; }
+  .counter__digit[data-digit="1"] :is(.seg-b, .seg-c) { fill: #76FF03; }
+  .counter__digit[data-digit="2"] :is(.seg-a, .seg-b, .seg-d, .seg-e, .seg-g) { fill: #76FF03; }
+  .counter__digit[data-digit="3"] :is(.seg-a, .seg-b, .seg-c, .seg-d, .seg-g) { fill: #76FF03; }
+  .counter__digit[data-digit="4"] :is(.seg-b, .seg-c, .seg-f, .seg-g) { fill: #76FF03; }
+  .counter__digit[data-digit="5"] :is(.seg-a, .seg-c, .seg-d, .seg-f, .seg-g) { fill: #76FF03; }
+  .counter__digit[data-digit="6"] :is(.seg-a, .seg-c, .seg-d, .seg-e, .seg-f, .seg-g) { fill: #76FF03; }
+  .counter__digit[data-digit="7"] :is(.seg-a, .seg-b, .seg-c) { fill: #76FF03; }
+  .counter__digit[data-digit="8"] :is(.seg-a, .seg-b, .seg-c, .seg-d, .seg-e, .seg-f, .seg-g) { fill: #76FF03; }
+  .counter__digit[data-digit="9"] :is(.seg-a, .seg-b, .seg-c, .seg-d, .seg-f, .seg-g) { fill: #76FF03; }
+
   .home__grid {
     width: 100%;
     display: grid;
@@ -75,6 +122,30 @@
     font-weight: 600;
     letter-spacing: 0.3px;
     color: #fff;
+  }
+
+  .card-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: #98a2b3;
+    font-variant-numeric: tabular-nums;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    line-height: 1.4;
+  }
+
+  .card-stat__icon {
+    font-size: 0.75rem;
+    line-height: 1;
+  }
+
+  .card-stat__value {
+    color: #fff;
+    font-weight: 600;
   }
 
   .home__card-versus {
