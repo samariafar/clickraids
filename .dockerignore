@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vscode
+.direnv
+docs/wiki
+target
+node_modules
+public
+data
+*.log
+*.bin
