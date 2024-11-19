@@ -1,0 +1,20 @@
+&--invasion {
+  --background-color: #2c1810;
+
+  background-color: var(--background-color);
+  scrollbar-color: #ffd700 var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+    vertical-align: middle;
+
+    &::before {
+      content: "🇷🇺";
+    }
+
+    &:checked::before {
+      content: "🇺🇦";
+    }
+  }
+}
