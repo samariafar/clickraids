@@ -27,7 +27,7 @@ For detailed information on **_ClickRaids_** installation and usage instructions
 
 ## ⚖️ License
 
-> Copyright © 2024–2025 [Sam Ariafar](mailto:me@samariafar.com)
+> Copyright © 2024–2026 [Sam Ariafar](mailto:me@samariafar.com)
 
 **_ClickRaids_** is distributed under the terms of the [MIT License](https://github.com/samariafar/clickraids/blob/main/LICENSE.md). Unless it is explicitly stated otherwise, any contribution intentionally submitted for inclusion in this project shall be licensed as _MIT_, without any additional terms or conditions.
 
