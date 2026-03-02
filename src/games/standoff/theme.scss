@@ -1,0 +1,20 @@
+&--standoff {
+  --background-color: #e8dcc4;
+
+  background-color: var(--background-color);
+  scrollbar-color: #b22234 var(--background-color);
+
+  .row .cell .checkbox {
+    appearance: none;
+    text-align: center;
+    vertical-align: middle;
+
+    &::before {
+      content: "🇺🇸";
+    }
+
+    &:checked::before {
+      content: "🇮🇷";
+    }
+  }
+}
