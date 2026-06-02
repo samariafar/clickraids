@@ -1,14 +1,15 @@
-*               text eol=lf
-.*              text eol=lf
+*                   text eol=lf
+.*                  text eol=lf
 
-*.ico           binary
-*.png           binary
-*.woff          binary
-*.woff2         binary
+*.ico               binary
+*.png               binary
+*.woff              binary
+*.woff2             binary
 
-*.md            diff=markdown
-*.mrconfig      linguist-language=ini diff=ini
-*.envrc         linguist-vendored=true
+*.md                diff=markdown
+*.mrconfig          linguist-language=ini diff=ini
+*.envrc             linguist-vendored=true
+linguist-ballast.*  linguist-vendored=false
 
-/.github        export-ignore
-/docs           export-ignore
+/.github            export-ignore
+/docs               export-ignore
