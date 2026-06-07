@@ -31,5 +31,16 @@
     </head>
     <body>
         <div id="<%= mountId %>"></div>
+
+        <script>
+          window.op=window.op||function(){var n=[];return new Proxy(function(){arguments.length&&n.push([].slice.call(arguments))},{get:function(t,r){return"q"===r?n:function(){n.push([r].concat([].slice.call(arguments)))}} ,has:function(t,r){return"q"===r}}) }();
+          window.op('init', {
+            clientId: 'b4433e61-cee5-43bd-b3b5-cd93d87a7b35',
+            trackScreenViews: true,
+            trackOutgoingLinks: true,
+            trackAttributes: true,
+          });
+        </script>
+        <script src="https://openpanel.dev/op1.js" defer async></script>
     </body>
 </html>

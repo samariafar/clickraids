@@ -41,6 +41,10 @@ export function renderGame(root: HTMLElement, game: Game): () => void {
       checkbox.type = 'checkbox';
       checkbox.className = `checkbox ${index}`;
       checkbox.checked = checkboxStates[index];
+      checkbox.addEventListener('click', () => {
+        window.op('track', `${gameName(game)}_game_clicks`);
+        window.op('track', 'total_game_clicks');
+      });
       checkbox.addEventListener('change', () => {
         checkboxStates[index] = checkbox.checked;
 
