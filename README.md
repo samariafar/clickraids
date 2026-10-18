@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-    <a href="https://www.hetzner.com">
-        <img src="https://img.shields.io/badge/Hetzner-Sponsored-d50c2d?logo=hetzner&style=flat-square" alt="Sponsored by Hetzner"></a>
+    <a href="https://fly.io">
+        <img src="https://img.shields.io/badge/Fly-Sponsored-7c3aed?logo=flydotio&style=flat-square" alt="Sponsored by Fly"></a>
     <a href="https://en.wikipedia.org/wiki/Proof_of_concept" target="_blank">
         <img src="https://img.shields.io/badge/purpose-PoC-6366f1?style=flat-square" alt="Proof of Concept"></a>
     <a href="https://github.com/samariafar/clickraids/blob/main/LICENSE.md">
