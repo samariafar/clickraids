@@ -15,10 +15,11 @@ use std::{
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},
-        Path, State,
+        Path, Request, State,
     },
-    http::{header, StatusCode},
-    response::IntoResponse,
+    http::{header, HeaderMap, StatusCode},
+    middleware::{self, Next},
+    response::{IntoResponse, Response},
     routing::get,
     Router,
 };
@@ -277,6 +278,23 @@ async fn handle_socket(socket: WebSocket, slug: &'static str, game: Arc<Game>) {
     log::info!("[{}] Player left. Game players: {}", slug, count);
 }
 
+// The app is only meant to be served on its custom domain. Fly auto-assigns a
+// *.fly.dev hostname with no native way to disable it, so reject those hosts
+// here. Runs on every route (HTTP and WebSocket upgrade) before handlers.
+async fn reject_fly_dev(headers: HeaderMap, request: Request, next: Next) -> Response {
+    let is_fly_dev = headers
+        .get(header::HOST)
+        .and_then(|v| v.to_str().ok())
+        .map(|host| host.split(':').next().unwrap_or(host))
+        .map(|host| host.ends_with(".fly.dev"))
+        .unwrap_or(false);
+
+    if is_fly_dev {
+        return (StatusCode::NOT_FOUND, "This hostname is disabled.").into_response();
+    }
+    next.run(request).await
+}
+
 #[tokio::main]
 async fn main() {
     env_logger::Builder::from_env(
@@ -349,7 +367,8 @@ async fn main() {
                 .append_index_html_on_directories(true)
                 .fallback(get(spa_fallback)),
         )
-        .with_state(app_state);
+        .with_state(app_state)
+        .layer(middleware::from_fn(reject_fly_dev));
 
     axum::serve(listener, app).await.unwrap();
 }
